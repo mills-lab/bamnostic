@@ -1,6 +1,14 @@
 #!/user/bin/env python
 # -*- coding: utf-8 -*-
-'''BAI file parser 
+"""BAI file parser 
+
+.. include:: <isonum.txt>
+
+Copyright |copy| 2018, Marcus D. Sherman
+
+This code is part of the bamnostic distribution and governed by its
+license.  Please see the LICENSE file that should have been included
+as part of this package.
 
 The Binary Alignment Map (BAM) format (defined at https://samtools.github.io/hts-specs/SAMv1.pdf)
 allows for indexing. When the user invokes a tool to index a given BAM file, a BAM index (BAI)
@@ -14,11 +22,8 @@ footprint and speeding up queries within a small number of references. Lastly, b
 as such, random access queries directly into the associated BAM file is available to other
 tools within bamnostic
 
-@author: "Marcus D. Sherman"
-@copyright: "Copyright 2018, University of Michigan, Mills Lab
-@email: "mdsherman<at>betteridiot<dot>tech"
-@version: "v0.5.0"
-'''
+"""
+
 from __future__ import print_function
 from __future__ import absolute_import
 from __future__ import division
@@ -351,8 +356,11 @@ class Bai(object):
                                         does not match indexed reference offset.
         '''
         if ref_id is not None and not idx:
-            ref_start, _, _ = self.ref_indices[ref_id]
-            self._io.seek(ref_start)
+            try:
+                ref_start, _, _ = self.ref_indices[ref_id]
+                self._io.seek(ref_start)
+            except KeyError:
+                raise KeyError('Reference is not found in header')
         ref_start = self._io.tell()
         
         if not idx:
