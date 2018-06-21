@@ -1,9 +1,11 @@
+[![Build Status](https://travis-ci.org/betteridiot/bamnostic.svg?branch=master)](https://travis-ci.org/betteridiot/bamnostic)
+[![noarch](https://img.shields.io/circleci/project/github/conda-forge/bamnostic-feedstock/master.svg?label=noarch)](https://circleci.com/gh/conda-forge/bamnostic-feedstock)
 [![Conda Version](https://img.shields.io/conda/vn/conda-forge/bamnostic.svg)](https://anaconda.org/conda-forge/bamnostic) 
 [![PyPI version](https://badge.fury.io/py/bamnostic.svg)](https://badge.fury.io/py/bamnostic) 
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://github.com/betteridiot/bamnostic/blob/master/LICENSE) 
-[![Anaconda-Server Badge](https://anaconda.org/conda-forge/bamnostic/badges/platforms.svg)](https://anaconda.org/conda-forge/bamnostic) 
 [![Conda Downloads](https://img.shields.io/conda/dn/conda-forge/bamnostic.svg)](https://anaconda.org/conda-forge/bamnostic) 
 [![Documentation Status](https://readthedocs.org/projects/bamnostic/badge/?version=latest)](https://bamnostic.readthedocs.io/en/latest/?badge=latest)
+[![Maintainability](https://api.codeclimate.com/v1/badges/d7e36e72f109c598c86d/maintainability)](https://codeclimate.com/github/betteridiot/bamnostic/maintainability)
 </br>
 
 # BAMnostic 
@@ -63,22 +65,22 @@ Bamnostic is meant to be a reduced drop-in replacement for [pysam](https://githu
 ### Importing
 
 ```python
-import bamnostic as bs
+>>> import bamnostic as bs
 ``` 
 
 ### Loading your BAM file
 Bamnostic comes with an example BAM (and respective BAI) file just to play around with the output. Note, however, that the example BAM file does not contain many reference contigs. Therefore, random access is limited. This example file is made availble through `bamnostic.example_bam`, which is a just a string path to the BAM file within the package.
 
 ```python
-bam = bs.AlignmentFile(bs.example_path, 'rb')
+>>> bam = bs.AlignmentFile(bs.example_path, 'rb')
 ``` 
 
 ### Get the header
 **Note**: this will print out the SAM header. If the SAM header is not in the BAM file, it will print out the dictionary representation of the BAM header. It is a dictionary of refID keys with contig names and length tuple values.
 
 ```python
-bam.header
->>> {0: ('chr1', 1575), 1: ('chr2', 1584)}
+>>> bam.header
+{0: ('chr1', 1575), 1: ('chr2', 1584)}
 ``` 
 
 ### Data validation through `head()`
@@ -92,33 +94,33 @@ bam.header
 ### Getting the first read
 
 ```python
-first_read = next(bam)
-print(first_read)
->>> EAS56_57:6:190:289:82	69	chr1	99	0		0	99	0	CTCAAGGTTGTTGCAAGGGGGTCTATGTGAACAAA	    MF:C:192
+>>> first_read = next(bam)
+>>> print(first_read)
+EAS56_57:6:190:289:82	69	chr1	100	0	*	=	100	0	CTCAAGGTTGTTGCAAGGGGGTCTATGTGAACAAA	<<<7<<<;<<<<<<<<8;;<7;4<;<;;;;;94<;	MF:C:192
 ``` 
 
 ### Exploring the read
 
 ```python
 # read name
-print(first_read.read_name)
->>> EAS56_57:6:190:289:82
+>>> print(first_read.read_name)
+EAS56_57:6:190:289:82
 
 # 0-based position
-print(first_read.pos)
->>> 99
+>>> print(first_read.pos)
+99
 
 # nucleotide sequence
-print(first_read.seq)
->>> CTCAAGGTTGTTGCAAGGGGGTCTATGTGAACAAA
+>>> print(first_read.seq)
+CTCAAGGTTGTTGCAAGGGGGTCTATGTGAACAAA
 
 # Read FLAG
-print(first_read.flag)
->>> 69
+>>> print(first_read.flag)
+69
 
 # decoded FLAG
-bs.utils.flag_decode(first_read.flag)
->>> [(1, 'read paired'), (4, 'read unmapped'), (64, 'first in pair')]
+>>> bs.utils.flag_decode(first_read.flag)
+[(1, 'read paired'), (4, 'read unmapped'), (64, 'first in pair')]
 ``` 
 
 ### Random Access
