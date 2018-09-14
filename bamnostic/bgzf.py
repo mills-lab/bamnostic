@@ -308,7 +308,12 @@ class BAMheader(object):
                     key = key[1:]
                     fields_dict = {}
                     for field in fields:
-                        tag, value = field.split(':')
+                        split_field = field.split(':')
+                        if len(split_field) > 2:
+                            tag = split_field[0]
+                            value = split_field[2]
+                        else:
+                            tag, value = split_field
                         try:
                             value = int(value)
                         except ValueError:
@@ -448,9 +453,11 @@ class BgzfReader(object):
         # Connect to the BAM file
         self._handle = handle
 
+        self._truncated = self._check_truncation()
+        self._igore_truncation = ignore_truncation
         # Check BAM file integrity
-        if not ignore_truncation:
-            if self._check_truncation():
+        if not self._igore_truncation:
+            if self._truncated:
                 raise Exception('BAM file may be truncated. Turn off ignore_truncation if you wish to continue')
 
         # Connect and process the Index file (if present)
@@ -520,7 +527,7 @@ class BgzfReader(object):
             if self._text:
                 self._buffer = ""
             else:
-                self._buffer = b""
+                self._buffer = b''
         self._within_block_offset = 0
         self._block_raw_length = block_size
 
@@ -1140,17 +1147,19 @@ class BgzfReader(object):
 
         Examples:
             >>> bam = bamnostic.AlignmentFile(bamnostic.example_bam, 'rb')
-            >>> bam.count_coverage('chr1', 100, 150) # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
-            (array('L', [0, 0, 0, 0, ..., 0, 0, 0, 0, 0]),
-            array('L', [0, 0, 0, 0, ..., 0, 0, 0, 0, 0]),
-            array('L', [1, 1, 2, 2, ..., 0, 14, 0, 14, 14]),
-            array('L', [0, 0, 0, 0, ..., 15, 0, 14, 0, 0]))
+            >>> for arr in bam.count_coverage('chr1', 100, 150): # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+            ...     print("array('{}', {})".format(arr.typecode, list(map(int, arr.tolist()))))
+            array('L', [0, 0, 0, 0, ..., 0, 0, 0, 0, 0])
+            array('L', [0, 0, 0, 0, ..., 0, 0, 0, 0, 0])
+            array('L', [1, 1, 2, 2, ..., 0, 14, 0, 14, 14])
+            array('L', [0, 0, 0, 0, ..., 15, 0, 14, 0, 0])
 
-            >>> bam.count_coverage('chr1', 100, 150, quality_threshold=20, base_quality_threshold=25) # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
-            (array('L', [0, 0, 0, 0, ..., 0, 0, 0, 0, 0]),
-            array('L', [0, 0, 0, 0, ..., 0, 0, 0, 0, 0]),
-            array('L', [1, 1, 2, 2, ..., 0, 14, 0, 13, 11]),
-            array('L', [0, 0, 0, 0,..., 14, 0, 13, 0, 0]))
+            >>> for arr in bam.count_coverage('chr1', 100, 150, quality_threshold=20, base_quality_threshold=25): # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
+            ...     print("array('{}', {})".format(arr.typecode, list(map(int, arr.tolist()))))
+            array('L', [0, 0, 0, 0, ..., 0, 0, 0, 0, 0])
+            array('L', [0, 0, 0, 0, ..., 0, 0, 0, 0, 0])
+            array('L', [1, 1, 2, 2, ..., 0, 14, 0, 13, 11])
+            array('L', [0, 0, 0, 0, ..., 14, 0, 13, 0, 0])
 
         """
 
@@ -1259,7 +1268,7 @@ class BgzfReader(object):
 
         Examples:
             >>> bam = bamnostic.AlignmentFile(bamnostic.example_bam, 'rb')
-            >>> bam.get_reference_name(0)
+            >>> bam.get_reference_name(0) # doctest: +ALLOW_UNICODE
             \'chr1'
 
             >>> bam.get_reference_name(10)
@@ -1374,7 +1383,7 @@ class BgzfReader(object):
             EAS56_57:6:190:289:82	...	MF:C:192
 
             >>> bam.head(n = 5, multiple_iterators = True)[1] # doctest: +ELLIPSIS, +NORMALIZE_WHITESPACE
-            EAS56_57:6:190:289:82	...	H1:C:0
+            EAS56_57:6:190:289:82	...	UQ:C:0
 
         """
         if multiple_iterators:

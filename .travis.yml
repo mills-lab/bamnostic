@@ -12,9 +12,24 @@ python:
   - "pypy"
   - "pypy3.5"
 
-# command to install dependencies
+before_install:
+  - chmod +x .travis/push.sh
+
 install:
   - pip install -r requirements.txt
   - pip install .
 
-script: pytest
+script: 
+  - pytest --doctest-modules bamnostic/
+
+branches:
+  only:
+    - devel
+
+jobs:
+  include:
+    - stage: deploy
+      script: .travis/push.sh
+      os: linux
+      language: python
+      python: "3.6"

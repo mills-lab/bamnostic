@@ -8,8 +8,12 @@
 [![status](http://joss.theoj.org/papers/9952b35bbb30ca6c01e6a27b80006bd8/status.svg)](http://joss.theoj.org/papers/9952b35bbb30ca6c01e6a27b80006bd8)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1341959.svg)](https://doi.org/10.5281/zenodo.1341959)
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://github.com/betteridiot/bamnostic/blob/master/LICENSE) 
-[![Conda Downloads](https://img.shields.io/conda/dn/conda-forge/bamnostic.svg)](https://anaconda.org/conda-forge/bamnostic) 
 </br> 
+
+|Host | Downloads |
+|:----|:---------:|
+|PyPI | [![Downloads](http://pepy.tech/badge/bamnostic)](http://pepy.tech/project/bamnostic)|
+|conda|[![Conda Downloads](https://img.shields.io/conda/dn/conda-forge/bamnostic.svg)](https://anaconda.org/conda-forge/bamnostic)|
 
 # BAMnostic 
 a *pure Python*, **OS-agnositic** Binary Alignment Map (BAM) file parser and random access tool.
@@ -198,7 +202,11 @@ The common practice within the field of genomics/genetics when analyzing BAM fil
 </br></br>
 In building a tool for genomic visualization, I wanted it to be platform agnostic. This is precisely when I found out that the tools I had planned to use as a backend did not work on Windows...the most prevalent operation system in the end-user world. So, I wrote **bamnostic**. As of this writing, bamnostic is OS-agnostic and written completely in Pure Python--requiring only the standard library (and `pytest` for the test suite). Special care was taken to ensure that it would run on all versions of CPython 2.7 or greater. Additionally, it runs in both stable versions of PyPy. While it may perform slower than its C counterparts, bamnostic opens up the science to a much greater end-user group. Lastly, it is lightweight enough to fit into any simple web server (e.g. [Flask](http://flask.pocoo.org/)), further expanding the science of genetics/genomics.
 
+***
+## Citation
+If you use bamnostic in your analyses, please consider citing [Li et al (2009)](http://www.ncbi.nlm.nih.gov/pubmed/19505943) as well. Regarding the citation for bamnostic, please use the JoSS journal article (click on the JOSS badge above) or use the following:
+>Sherman MD and Mills RE, (2018). BAMnostic: an OS-agnostic toolkit for genomic sequence analysis . Journal of Open Source Software, 3(28), 826, https://doi.org/10.21105/joss.00826
 
 ***
 ## Community Guidelines:
-Eagerly accepting PRs for improvements, optimizations, or features. For any questions or issues, please feel free to make a post to bamnostic's [Issue tracker](https://github.com/betteridiot/bamnostic/issues) on github.
+Eagerly accepting PRs for improvements, optimizations, or features. For any questions or issues, please feel free to make a post to bamnostic's [Issue tracker](https://github.com/betteridiot/bamnostic/issues) on github or read over our [CONTRIBUTING](https://github.com/betteridiot/bamnostic/blob/master/CONTRIBUTING.md) documentation.
