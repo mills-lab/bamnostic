@@ -186,10 +186,11 @@ def flag_decode(flag_code):
     return sorted([(key, flags[key]) for key in flags if key & code])
 
 
-def yes_no():
+def yes_no(message):
     """ Simple prompt parser"""
-    yes = set('yes', 'ye', 'y', '')
-    no = set('no', 'n')
+    yes = set(['yes', 'ye', 'y', ''])
+    no = set(['no', 'n'])
+    print(message)
     while True:
         answer = input('Would you like to continue? [y/n] ').lower()
         if answer in yes:
@@ -247,7 +248,7 @@ def _handle_split_region(split_roi, until_eof=False):
 
         # if the user gives an integer description of chromosome, convert to string
         if isinstance(split_roi[0], (str, int)):
-            split_roi[0] = str(split_roi[0]).lower()
+            split_roi[0] = str(split_roi[0])
 
         if None in split_roi[1:]:
             # make sure the user wants to continue if they have used an open-ended region
@@ -479,7 +480,7 @@ class LruDict(OrderedDict):
         if _is_pypy:
             self.move_to_end = self._pypy_move_to_end
         elif _PY_VERSION[:2] <= (3,2):
-            self.move_to_end = self._move_to_end
+            self.move_to_end = self._py27_move_to_end
         else:
             self.move_to_end = OrderedDict.move_to_end
         self.cull()
@@ -498,7 +499,7 @@ class LruDict(OrderedDict):
     def _pypy_move_to_end(self, key, last=True):
         __pypy__.move_to_end(self, key, last)
         
-    def _move_to_end(self, key, last=True):
+    def _py27_move_to_end(self, key, last=True):
         """Move an existing element to the end (or beginning if last is false).
         Raise KeyError if the element does not exist.
         """

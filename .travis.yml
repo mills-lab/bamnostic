@@ -1,6 +1,6 @@
 os:
   - linux
-  - windows
+#  - windows
 
 language: python
 python:
@@ -8,17 +8,26 @@ python:
   - "3.4"
   - "3.5"
   - "3.6"
-  - "3.7-dev"
   - "pypy"
   - "pypy3.5"
+
+matrix:
+  include:
+    - python: 3.7
+      dist: xenial
+      sudo: true
 
 before_install:
   - chmod +x .travis/push.sh
 
 install:
+  - git clone https://github.com/$TRAVIS_REPO_SLUG.git $TRAVIS_REPO_SLUG
+  - cd $TRAVIS_REPO_SLUG
+  - git checkout -qf $TRAVIS_COMMIT
   - pip install -r requirements.txt
   - pip install .
 
 script: 
   - pytest --doctest-modules bamnostic/
+  - pytest
 

@@ -1,14 +1,19 @@
-[![Build Status](https://travis-ci.org/betteridiot/bamnostic.svg?branch=master)](https://travis-ci.org/betteridiot/bamnostic)
-[![noarch](https://img.shields.io/circleci/project/github/conda-forge/bamnostic-feedstock/master.svg?label=noarch)](https://circleci.com/gh/conda-forge/bamnostic-feedstock)
+
 [![Documentation Status](https://readthedocs.org/projects/bamnostic/badge/?version=latest)](https://bamnostic.readthedocs.io/en/latest/?badge=latest)
 [![Conda Version](https://img.shields.io/conda/vn/conda-forge/bamnostic.svg)](https://anaconda.org/conda-forge/bamnostic) 
 [![PyPI version](https://badge.fury.io/py/bamnostic.svg)](https://badge.fury.io/py/bamnostic) 
 [![Maintainability](https://api.codeclimate.com/v1/badges/d7e36e72f109c598c86d/maintainability)](https://codeclimate.com/github/betteridiot/bamnostic/maintainability)
 
 [![status](http://joss.theoj.org/papers/9952b35bbb30ca6c01e6a27b80006bd8/status.svg)](http://joss.theoj.org/papers/9952b35bbb30ca6c01e6a27b80006bd8)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1341959.svg)](https://doi.org/10.5281/zenodo.1341959)
+[![DOI](https://zenodo.org/badge/121782433.svg)](https://zenodo.org/badge/latestdoi/121782433)
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://github.com/betteridiot/bamnostic/blob/master/LICENSE) 
 </br> 
+
+|Platform | Build Status |
+|:--------|:------------:|
+|Linux    | [![Build Status TravisCI](https://travis-ci.org/betteridiot/bamnostic.svg?branch=master)](https://travis-ci.org/betteridiot/bamnostic) |
+|Windows  | [![Build status Appveyor](https://ci.appveyor.com/api/projects/status/y95q02gkv3lgmlf4/branch/master?svg=true)](https://ci.appveyor.com/project/betteridiot/bamnostic/branch/master)|
+|conda    | [![noarch](https://img.shields.io/circleci/project/github/conda-forge/bamnostic-feedstock/master.svg?label=noarch)](https://circleci.com/gh/conda-forge/bamnostic-feedstock)|
 
 |Host | Downloads |
 |:----|:---------:|
@@ -75,7 +80,7 @@ Bamnostic is meant to be a reduced drop-in replacement for [pysam](https://githu
 >>> import bamnostic as bs
 ``` 
 
-### Loading your BAM file (Note: CRAM and CSI formats are not supported at this time)
+### Loading your BAM file (Note: CRAM format are not supported at this time)
 Bamnostic comes with an example BAM (and respective BAI) file just to play around with the output. Note, however, that the example BAM file does not contain many reference contigs. Therefore, random access is limited. This example file is made availble through `bamnostic.example_bam`, which is a just a string path to the BAM file within the package.
 
 ```python

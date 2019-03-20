@@ -1,0 +1,34 @@
+build: off
+
+# Ignore commits that have no effect on operations
+skip_commits:
+  message: /.*(docs|versioning).*/
+
+environment:
+  matrix:
+    - platform: x86
+      PYTHON: "C:\\Python27"
+    - platform: x64
+      PYTHON: "C:\\Python27-x64"
+    - platform: x86
+      PYTHON: "C:\\Python34"
+    - platform: x64
+      PYTHON: "C:\\Python34-x64"
+    - platform: x86
+      PYTHON: "C:\\Python35"
+    - platform: x64
+      PYTHON: "C:\\Python35-x64"
+    - platform: x86
+      PYTHON: "C:\\Python36"
+    - platform: x64
+      PYTHON: "C:\\Python36-x64"
+    - platform: x86
+      PYTHON: "C:\\Python37"
+    - platform: x64
+      PYTHON: "C:\\Python37-x64"
+
+install:
+  - "%PYTHON%/Scripts/pip install pytest"
+
+test_script:
+  - "%PYTHON%/python setup.py test"

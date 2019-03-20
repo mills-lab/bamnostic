@@ -35,19 +35,14 @@ import warnings
 from array import array
 from collections import namedtuple
 
-_PY_VERSION = sys.version
+_PY_VERSION = sys.version_info
 
-if _PY_VERSION.startswith('2'):
+if _PY_VERSION[0] == 2:
     from io import open
-
-if not _PY_VERSION.startswith('2'):
+else:
     from functools import lru_cache
 
 from bamnostic.utils import *
-
-
-def format_warnings(message, category, filename, lineno, file=None, line=None):
-    return ' {}:{}: {}:{}'.format(filename, lineno, category.__name__, message)
 
 
 warnings.formatwarning = format_warnings
@@ -75,25 +70,23 @@ class conditional_decorator(object):
 RefIdx = namedtuple('RefIdx', ('start_offset', 'end_offset', 'n_bins'))
 
 
-class Bin(object):
-    __slots__ = ['bin_id', 'chunks']
-
-    def __init__(self, *args):
-        self.bin_id, self.chunks = args
-
-
 class Chunk(object):
     __slots__ = ['voffset_beg', 'voffset_end']
 
     def __init__(self, handle):
         self.voffset_beg, self.voffset_end = unpack_chunk(handle.read(16))
 
+    def __repr__(self):
+        return 'Chunk(voffset_beg={}, voffset_end={})'.format(self.voffset_beg, self.voffset_end)
 
 class Ref(object):
     __slots__ = ['bins', 'intervals', 'ref_id']
 
     def __init__(self, *args):
         self.bins, self.intervals, self.ref_id = args
+
+    def __getitem__(self, key):
+        return self.bins[key]
 
 
 class Unmapped(object):
@@ -106,20 +99,20 @@ class Unmapped(object):
         self.n_unmapped = numap
 
 
-def reg2bin(beg, end):
+def reg2bin(rbeg, rend):
     """Finds the largest superset bin of region. Numeric values taken from hts-specs
 
     Args:
-        beg (int): inclusive beginning position of region
-        end (int): exclusive end position of region
+        rbeg (int): inclusive beginning position of region
+        rend (int): exclusive end position of region
 
     Returns:
         (int): distinct bin ID for largest superset bin of region
     """
     left_shift = 15
     for i in range(14, 27, 3):
-        if beg >> i == (end - 1) >> i:
-            return int(((1 << left_shift) - 1) / 7 + (beg >> i))
+        if rbeg >> i == (rend - 1) >> i:
+            return int(((1 << left_shift) - 1) / 7 + (rbeg >> i))
         left_shift -= 3
     else:
         return 0
@@ -129,8 +122,8 @@ def reg2bins(rbeg, rend):
     """Generates bin ids which overlap the specified region.
 
     Args:
-        beg (int): inclusive beginning position of region
-        end (int): exclusive end position of region
+        rbeg (int): inclusive beginning position of region
+        rend (int): exclusive end position of region
 
     Yields:
         (int): bin IDs for overlapping bins of region
@@ -205,7 +198,6 @@ class Bai(object):
             self._io = open(filename, 'rb')
         else:
             raise OSError('{} not found. Please change check your path or index your BAM file'.format(filename))
-        self._io = open(filename, 'rb')
 
         # Constant for linear index window size and unmapped bin id
         self._LINEAR_INDEX_WINDOW = 16384
@@ -325,7 +317,7 @@ class Bai(object):
 
     # @functools.lru_cache(maxsize=256, typed=True)
     # @lru_cache(6)
-    @conditional_decorator(lambda func: lru_cache(maxsize=6)(func), _PY_VERSION.startswith('2'))
+    @conditional_decorator(lambda func: lru_cache(maxsize=6)(func), _PY_VERSION[0] == 2)
     def get_ref(self, ref_id=None, idx=False):
         """Interatively unpacks all the bins, linear intervals, and chunks for a given reference
 
@@ -405,8 +397,6 @@ class Bai(object):
             self.current_ref = self.get_ref(ref_id)
 
         # get linear index first
-        # how many windows do we need to go over
-        # because of floor div, we need to make it 0-based
 
         reg_lin_idx = start >> self.BAM_LIDX_SHIFT
 
@@ -415,14 +405,12 @@ class Bai(object):
 
         for binID in reg2bins(start, stop):
             try:
-                bin_chunks = self.current_ref.bins[binID]
+                bin_chunks = self.current_ref[binID]
             except KeyError:
                 continue
 
             for chunk in bin_chunks:
-                if not linear_offset <= chunk.voffset_end:
-                    continue
-                else:
+                if chunk.voffset_beg <= linear_offset <= chunk.voffset_end:
                     return chunk.voffset_beg
 
     def seek(self, offset=None, whence=0):
