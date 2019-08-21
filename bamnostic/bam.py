@@ -327,15 +327,21 @@ class BamReader(bgzf.BgzfReader):
         """Initialize the index file (BAI)"""
 
         if self._check_idx:
-            #self._index = bamnostic.bai.Bai(self._index_path)
-            if self._index_ext == 'csi':
+            # self._index = bamnostic.bai.Bai(self._index_path)
+            if self._index_ext == "csi":
                 self._index = csi.Csi(self._index_path)
-            elif self._index_ext == 'bai':
+            elif self._index_ext == "bai":
                 self._index = bai.Bai(self._index_path)
 
             self.__nocoordinate = self._index.n_no_coor
-            self.__mapped = sum(self._index.unmapped[mapped].n_mapped for mapped in self._index.unmapped) + self.nocoordinate
-            self.__unmapped = sum(self._index.unmapped[unmapped].n_unmapped for unmapped in self._index.unmapped) + self.nocoordinate
+            self.__mapped = sum(
+                self._index.unmapped[mapped].n_mapped
+                for mapped in self._index.unmapped
+            ) + (self.__nocoordinate if self.__nocoordinate is not None else 0)
+            self.__unmapped = sum(
+                self._index.unmapped[unmapped].n_unmapped
+                for unmapped in self._index.unmapped
+            ) + (self.__nocoordinate if self.__nocoordinate is not None else 0)
 
     @property
     def nocoordinate(self):
@@ -363,7 +369,7 @@ class BamReader(bgzf.BgzfReader):
         Returns:
             (int): sum of unmapped reads and reads without coordinates
         """
-        return self.__unmapped + self.nocoordinate
+        return self.__unmapped + self.__nocoordinate
 
     def _check_sq(self):
         """ Inspect BAM file for @SQ entries within the header
@@ -486,7 +492,7 @@ class BamReader(bgzf.BgzfReader):
     def fetch(self, contig=None, start=None, stop=None, region=None,
               tid=None, until_eof=False, multiple_iterators=False,
               reference=None, end=None):
-        r"""Creates a generator that returns all reads within the given region. (inclusive, exclusive)
+        """Creates a generator that returns all reads within the given region. (inclusive, exclusive)
 
         Args:
             contig (str): name of reference/contig
@@ -507,16 +513,18 @@ class BamReader(bgzf.BgzfReader):
             ValueError: if the genomic coordinates are out of range or invalid
             KeyError: Reference is not found in header
 
-        Notes:
+        Note:
             SAM region formatted strings take on the following form:
             'chr1:100000-200000'
 
         Usage:
-            AlignmentFile.fetch(contig='chr1', start=1, stop= 1000)
-            AlignmentFile.fetch('chr1', 1, 1000)
-            AlignmentFile.fetch('chr1:1-1000')
-            AlignmentFile.fetch('chr1', 1)
-            AlignmentFile.fetch('chr1')
+            .. code-block:: python
+            
+                AlignmentFile.fetch(contig='chr1', start=1, stop= 1000)
+                AlignmentFile.fetch('chr1', 1, 1000)
+                AlignmentFile.fetch('chr1:1-1000')
+                AlignmentFile.fetch('chr1', 1)
+                AlignmentFile.fetch('chr1')
 
         Examples:
             >>> bam = bamnostic.AlignmentFile(bamnostic.example_bam, 'rb')
@@ -542,7 +550,7 @@ class BamReader(bgzf.BgzfReader):
         # Inclusive, exclusive. This means if start and stop are
         # the same, then the user is *essentially* looking at nothing
         # e.g. a = "abc"; print(a[1:1]) -> ''
-        if start == stop:
+        if start is not None and start == stop:
             return
 
         if not self._random_access:
@@ -568,6 +576,8 @@ class BamReader(bgzf.BgzfReader):
                 raise KeyError('{} was not found in the file header'.format(query.contig))
 
         try:
+            if query.start is None:
+                query.start = 0
             if query.start > self._header.refs[query.tid][1]:
                 raise ValueError('Genomic region out of bounds.')
             if query.stop is None:
